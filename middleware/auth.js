@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const { User } = require('../models/user');
 
 module.exports = async (req, res, next) => {
-    const token = req.header('magic-token');
+    const token = req.header('x-dews-token');
     if (!token) return res.json({ status: 401, data: 'Access denied, no token provided...' });
 
     try {

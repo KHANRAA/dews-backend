@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const chalk = require('chalk');
+const _ = require('lodash');
 
 const auth = require('../middleware/auth');
 const admin = require('../middleware/admin');
@@ -39,7 +40,7 @@ router.post('/register/password', async (req, res, next) => {
                 return sendSuccessResponse(res, `Wohhooo .. user created with data ${ JSON.stringify(result) }`);
             })
             .catch(err => {
-                return sendErrorResponse(res, err.message);
+                next(err);
             });
 
     }
@@ -55,7 +56,7 @@ router.post('/login', async (req, res) => {
     const validPassword = await bcrypt.compare(req.body.password, user.password);
     if (!validPassword) return sendErrorResponse(res, 'Please check the password and try again...');
     const token = await user.generateAuthToken();
-    sendRedirectResponse(res, token);
+    return res.header('x-dews-token', token).send(_.pick(user, ['_id', 'name', 'email', 'role', 'avatarUrl', '']));
 
 });
 

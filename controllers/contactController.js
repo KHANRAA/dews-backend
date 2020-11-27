@@ -28,7 +28,7 @@ router.post('/submit', async (req, res, next) => {
         return sendSuccessResponse(res, 'Successfully submitted...');
     }).catch((err) => {
         console.log(chalk.redBright(`${ err.message }`));
-        return sendErrorResponse(res, err.message);
+       next(err);
     });
 });
 
@@ -40,7 +40,7 @@ router.put('/respond', auth, admin, validateObjectId, async (req, res, next) => 
         return sendSuccessResponse(res, 'Successfully responded to the contact...');
     }).catch((err) => {
         console.log(chalk.redBright(`${ err.message }`));
-        return sendErrorResponse(res, err.message);
+       next(err);
     });
 });
 
@@ -54,12 +54,12 @@ router.put('/spam', auth, admin, validateObjectId, async (req, res, next) => {
         await user.save()
             .then(() => {console.log(chalk.red(`User with: ${ user.email } is marked as inActive `));})
             .catch(err => {
-                sendErrorResponse(res, err.message);
+               next(err);
             });
         return sendSuccessResponse(res, 'Successfully marked this email as  spam...');
     }).catch((err) => {
         console.log(chalk.redBright(`${ err.message }`));
-        return sendErrorResponse(res, err.message);
+        next(err);
     });
 });
 
@@ -67,7 +67,7 @@ router.delete('/delete', auth, admin, validateObjectId, async (req, res, next) =
     await Contact.findOneAndDelete({ _id: req.body.id }).then(result => {
         return sendSuccessResponse(res, `${ JSON.stringify(result) }`);
     }).catch(err => {
-        return sendErrorResponse(res, err.message);
+       next(err);
     });
 
 });

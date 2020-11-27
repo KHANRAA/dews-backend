@@ -42,7 +42,7 @@ router.put('/like', auth, validateObjectId, async (req, res, next) => {
     if (user.likes.some(userObj => userObj._id === req.body.id)) return sendSuccessResponse(res, 'Already Liked ...');
     blog.likedBy.push(user);
     await blog.save().then(success => { return sendSuccessResponse(res, `${ JSON.stringify(success) }`);}).catch(err => {
-        sendErrorResponse(res, err.message);
+      next(err);
     });
 });
 
@@ -77,7 +77,7 @@ router.delete('/delete', auth, admin, validateObjectId, async (req, res, next) =
     await Blog.findOneAndDelete({ _id: req.body.id }).then(result => {
         return sendSuccessResponse(res, `${ JSON.stringify(result) }`);
     }).catch(err => {
-        return sendErrorResponse(res, err.message);
+       next(err);
     });
 
 });

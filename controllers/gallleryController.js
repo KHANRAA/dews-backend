@@ -75,7 +75,7 @@ router.put('/like', auth, validateObjectId, async (req, res, next) => {
     if (galleyPhoto.likedBy.some(userObj => userObj._id === user._id)) sendErrorResponse(res, 'Already Liked ...');
     galleyPhoto.likedBy.push(user);
     await galleyPhoto.save().then(success => { return sendSuccessResponse(res, `${ JSON.stringify(success) }`);}).catch(err => {
-        return sendErrorResponse(res, err.message);
+        next(err);
     });
 });
 
@@ -83,7 +83,7 @@ router.delete('/delete', auth, admin, validateObjectId, async (req, res, next) =
     await GalleryPhoto.findOneAndDelete({ _id: req.body.id }).then(result => {
         return sendSuccessResponse(res, `${ JSON.stringify(result) }`);
     }).catch(err => {
-        return sendErrorResponse(res, err.message);
+        next(err);
     });
 
 });

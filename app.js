@@ -1,21 +1,22 @@
+const winston = require('winston');
 const express = require('express');
 const app = express();
-const morgan = require('morgan');
-// const config = require('config');
+// const morgan = require('morgan');
 const bodyParser = require('body-parser');
-const winston = require('winston');
 const chalk = require('chalk');
 
+require('./startup/logging');
 require('./startup/db')();
 require('./startup/routes')(app);
 require('./startup/validation')();
+require('./startup/config')();
+require('./startup/validation')();
+
 
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-if (app.get('env') === 'development' || undefined) {
-    app.use(morgan('dev'));
-    winston.info('Morgan Enabled....');
+if (app.get('env') !== 'production') {
 }
 app.use(express.static(__dirname + 'public'));
 

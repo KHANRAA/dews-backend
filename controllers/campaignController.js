@@ -57,7 +57,7 @@ router.post('/create', auth, admin, async (req, res, next) => {
     }
 
     await campaign.save().then(() => sendSuccessResponse(res, 'Successfully added campaign..')).catch((err) => {
-        sendErrorResponse(res, err.message);
+        next(err);
     });
 
 });
@@ -84,7 +84,7 @@ router.put('/update', auth, admin, async (req, res, enext) => {
     campaign.save().then(() => {
         return sendSuccessResponse(res, 'Successfully updated campaign...');
     }).catch((err) => {
-        return sendErrorResponse(res, err.message);
+        next(err);
     });
 
 });
@@ -97,7 +97,7 @@ router.post('/join', auth, validateObjectId, async (req, res, next) => {
     await campaign.save().then(() => {
         return sendSuccessResponse(res, 'See you soon in the campaign...');
     }).catch((err) => {
-        return sendErrorResponse(res, err.message);
+        next(err);
     });
 });
 
