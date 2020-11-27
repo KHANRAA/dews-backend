@@ -25,26 +25,26 @@ router.post('/submit', async (req, res, next) => {
         message: req.body.subject,
     });
     await contact.save().then(() => {
-        sendSuccessResponse(res, 'Successfully submitted...');
+        return sendSuccessResponse(res, 'Successfully submitted...');
     }).catch((err) => {
         console.log(chalk.redBright(`${ err.message }`));
-        sendErrorResponse(res, err.message);
+        return sendErrorResponse(res, err.message);
     });
 });
 
-router.put('/respond',  auth, admin,  validateObjectId, async (req, res, next) => {
+router.put('/respond', auth, admin, validateObjectId, async (req, res, next) => {
     const contact = Contact.findOne({ _id: req.body.id });
     if (!contact) sendErrorResponse(res, 'No contact req foound for this id...');
     contact.isResponded = true;
     await contact.save().then(() => {
-        sendSuccessResponse(res, 'Successfully responded to the contact...');
+        return sendSuccessResponse(res, 'Successfully responded to the contact...');
     }).catch((err) => {
         console.log(chalk.redBright(`${ err.message }`));
-        sendErrorResponse(res, err.message);
+        return sendErrorResponse(res, err.message);
     });
 });
 
-router.put('/spam',  auth, admin,  validateObjectId, async (req, res, next) => {
+router.put('/spam', auth, admin, validateObjectId, async (req, res, next) => {
     const contact = Contact.findOne({ _id: req.body.id });
     if (!contact) sendErrorResponse(res, 'No contact req found for this id...');
     contact.isSpam = true;
@@ -56,33 +56,33 @@ router.put('/spam',  auth, admin,  validateObjectId, async (req, res, next) => {
             .catch(err => {
                 sendErrorResponse(res, err.message);
             });
-        sendSuccessResponse(res, 'Successfully marked this email as  spam...');
+        return sendSuccessResponse(res, 'Successfully marked this email as  spam...');
     }).catch((err) => {
         console.log(chalk.redBright(`${ err.message }`));
-        sendErrorResponse(res, err.message);
+        return sendErrorResponse(res, err.message);
     });
 });
 
-router.delete('/delete',  auth, admin,  validateObjectId, async (req, res, next) => {
+router.delete('/delete', auth, admin, validateObjectId, async (req, res, next) => {
     await Contact.findOneAndDelete({ _id: req.body.id }).then(result => {
-        sendSuccessResponse(res, `${ JSON.stringify(result) }`);
+        return sendSuccessResponse(res, `${ JSON.stringify(result) }`);
     }).catch(err => {
-        sendErrorResponse(res, err.message);
+        return sendErrorResponse(res, err.message);
     });
 
 });
 
 
-sendSuccessResponse = (res, responseMessage) => {
-    return res.json({ status: 200, data: responseMessage });
+const sendSuccessResponse = (res, responseMessage) => {
+    res.json({ status: 200, data: responseMessage });
 };
 
-sendRedirectResponse = (res, responseMessage) => {
-    return res.json({ status: 302, data: responseMessage });
+const sendRedirectResponse = (res, responseMessage) => {
+    res.json({ status: 302, data: responseMessage });
 };
 
-sendErrorResponse = (res, error) => {
-    return res.json({ status: 400, data: error });
+const sendErrorResponse = (res, error) => {
+    res.json({ status: 400, data: error });
 };
 
 module.exports = router;

@@ -28,6 +28,7 @@ const campaignSchema = new Schema({
     },
     campaignType: {
         type: String,
+        enum: ['normal', 'fund'],
         required: true,
     },
     campaignPhoto: {
@@ -41,6 +42,9 @@ const campaignSchema = new Schema({
     goalAmount: {
         type: Number,
     },
+    collectedAmount: {
+        type: Number,
+    },
     campaignDate: {
         type: Date,
         required: true,
@@ -52,13 +56,23 @@ const campaignSchema = new Schema({
         },
         amount: {
             type: Number,
-            donateDate: {
+            transactionDate: {
                 type: Date,
             },
             method: {
                 type: String,
                 minlength: 3,
             },
+        }
+    }],
+    volunteers: [{
+        user: {
+            type: Schema.Types.ObjectID,
+            ref: 'User',
+        },
+        joinDate: {
+            type: Date,
+            default: Date.now(),
         }
     }],
     tags: [
@@ -73,11 +87,12 @@ const campaignSchema = new Schema({
 
 const Campaign = mongoose.model('Campaign', campaignSchema);
 
-validateCampaignSchemaWithOutFund = async (campaignData) => {
+validateCampaignSchemaForFund = async (campaignData) => {
     const schema = Joi.object({
         title: Joi.string().min(3).required(),
         subtitle: Joi.string().min(3).required(),
         content: Joi.string().min(20).max(1024).required(),
+        goalAmount: Joi.number().min(1).required(),
         campaignType: Joi.string().valid('fund', 'general').required(),
         imageUrl: Joi.string().uri().empty('').default('acasc').required(),
         campaignDate: Joi.date().required()
@@ -88,15 +103,53 @@ validateCampaignSchemaWithOutFund = async (campaignData) => {
     }
 };
 
-validateCampaignSchemaWithFund = async (campaignData) => {
+validateCampaignSchema = async (campaignData) => {
     const schema = Joi.object({
         title: Joi.string().min(3).required(),
         subtitle: Joi.string().min(3).required(),
         content: Joi.string().min(20).max(1024).required(),
         campaignType: Joi.string().valid('fund', 'general').required(),
         imageUrl: Joi.string().uri().empty('').default('acasc').required(),
+        goalAmount: Joi.number().min(1).max(1000000).required(),
+        campaignDate: Joi.date().min(Date.now()).required(),
+        tags: Joi.array().items(Joi.string().min(2)).empty(),
+    });
+    try {
+        return await schema.validate(campaignData);
+    } catch (err) {
+    }
+};
+
+validateCampaignUpdateSchema = async (campaignData) => {
+    const schema = Joi.object({
+        id: Joi.string().required(),
+        title: Joi.string().min(3).required(),
+        subtitle: Joi.string().min(3).required(),
+        content: Joi.string().min(20).max(1024).required(),
+        campaignType: Joi.string().valid('fund', 'general').required(),
+        isActive: Joi.boolean().required(),
+        imageUrl: Joi.string().uri().empty('').default('acasc').required(),
+        goalAmount: Joi.number().min(1).max(1000000).required(),
+        campaignDate: Joi.date().min(Date.now()).required(),
+        tags: Joi.array().items(Joi.string().min(2)).empty(),
+    });
+    try {
+        return await schema.validate(campaignData);
+    } catch (err) {
+    }
+};
+
+validateCampaignUpdateSchemaForFund = async (campaignData) => {
+    const schema = Joi.object({
+        id: Joi.string().required(),
+        title: Joi.string().min(3).required(),
+        subtitle: Joi.string().min(3).required(),
+        content: Joi.string().min(20).max(1024).required(),
         goalAmount: Joi.number().min(1).required(),
-        campaignDate: Joi.date().min(Date.now()).required()
+        isActive: Joi.boolean().required(),
+        campaignType: Joi.string().valid('fund', 'general').required(),
+        imageUrl: Joi.string().uri().empty('').default('acasc').required(),
+        campaignDate: Joi.date().required()
     });
     try {
         return await schema.validate(campaignData);
@@ -105,5 +158,7 @@ validateCampaignSchemaWithFund = async (campaignData) => {
 };
 
 exports.Campaign = Campaign;
-exports.validateCampaignSchemaWithOutFund = validateCampaignSchemaWithOutFund;
-exports.validateCampaignSchemaWithFund = validateCampaignSchemaWithFund;
+exports.validateCampaignSchema = validateCampaignSchema;
+exports.validateCampaignSchemaForFund = validateCampaignSchemaForFund;
+exports.validateCampaignUpdateSchema = validateCampaignUpdateSchema;
+exports.validateCampaignUpdateSchemaForFund = validateCampaignUpdateSchemaForFund;

@@ -27,7 +27,7 @@ router.post('/add', auth, async (req, res, next) => {
     });
     await blog.save().then(result => {
         console.log(chalk.green(JSON.stringify(result)));
-        sendSuccessResponse(res, 'Successfully inserted blog ...');
+        return sendSuccessResponse(res, 'Successfully inserted blog ...');
     }).catch(err => {
         console.log(chalk.redBright(err.message));
         sendErrorResponse(err.message);
@@ -39,9 +39,9 @@ router.put('/like', auth, validateObjectId, async (req, res, next) => {
     const user = req.user;
     const blog = await Blog.findOne({ _id: req.body.id });
     if (!blog) sendErrorResponse(res, `Blog not exists please recheck ... id: ${ req.body.id }`);
-    if (user.likes.some(userObj => userObj._id === req.body.id)) sendSuccessResponse(res, 'Already Liked ...');
+    if (user.likes.some(userObj => userObj._id === req.body.id)) return sendSuccessResponse(res, 'Already Liked ...');
     blog.likedBy.push(user);
-    await blog.save().then(success => { sendSuccessResponse(res, `${ JSON.stringify(success) }`);}).catch(err => {
+    await blog.save().then(success => { return sendSuccessResponse(res, `${ JSON.stringify(success) }`);}).catch(err => {
         sendErrorResponse(res, err.message);
     });
 });
@@ -58,7 +58,7 @@ router.put('/comment', auth, validateObjectId, async (req, res, next) => {
     })
     await comment.save().then((commentRes) => {
         console.log(chalk.cyan(JSON.stringify(commentRes)));
-        sendSuccessResponse(res, JSON.stringify(commentRes));
+        return sendSuccessResponse(res, JSON.stringify(commentRes));
     }).catch();
 
 });
@@ -69,30 +69,30 @@ router.delete('/comment', auth, validateObjectId, async (req, res, next) => {
     if (!comment) sendErrorResponse(res, 'Comment Not Exists...');
     if (comment.commentBy._id !== user._id || user.role !== 'Admin') sendErrorResponse(res, `You don't have access to remove the comment.`);
     await Comment.findOneAndDelete({ _id: req.body.id })
-        .then(() => sendSuccessResponse(res, 'Successfully deleted comment'))
+        .then(() => { return sendSuccessResponse(res, 'Successfully deleted comment'); })
         .catch(err => {sendErrorResponse(res, err.message)});
 });
 
 router.delete('/delete', auth, admin, validateObjectId, async (req, res, next) => {
     await Blog.findOneAndDelete({ _id: req.body.id }).then(result => {
-        sendSuccessResponse(res, `${ JSON.stringify(result) }`);
+        return sendSuccessResponse(res, `${ JSON.stringify(result) }`);
     }).catch(err => {
-        sendErrorResponse(res, err.message);
+        return sendErrorResponse(res, err.message);
     });
 
 });
 
 
-sendSuccessResponse = (res, responseMessage) => {
-    return res.json({ status: 200, data: responseMessage });
+const sendSuccessResponse = (res, responseMessage) => {
+    res.json({ status: 200, data: responseMessage });
 };
 
-sendRedirectResponse = (res, responseMessage) => {
-    return res.json({ status: 302, data: responseMessage });
+const sendRedirectResponse = (res, responseMessage) => {
+    res.json({ status: 302, data: responseMessage });
 };
 
-sendErrorResponse = (res, error) => {
-    return res.json({ status: 400, data: error });
+const sendErrorResponse = (res, error) => {
+    res.json({ status: 400, data: error });
 };
 
 module.exports = router;

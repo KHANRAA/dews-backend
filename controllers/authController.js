@@ -59,22 +59,20 @@ router.post('/login', async (req, res) => {
 
 });
 
-
-
 router.put('/update/role', (req, res, next) => {
     //todo
 });
 
-sendSuccessResponse = (res, responseMessage) => {
-    return res.json({ status: 200, data: responseMessage });
+const sendSuccessResponse = (res, responseMessage) => {
+    res.json({ status: 200, data: responseMessage });
 };
 
-sendRedirectResponse = (res, responseMessage) => {
-    return res.json({ status: 302, data: responseMessage });
+const sendRedirectResponse = (res, responseMessage) => {
+    res.json({ status: 302, data: responseMessage });
 };
 
-sendErrorResponse = (res, error) => {
-    return res.json({ status: 400, data: error });
+const sendErrorResponse = (res, error) => {
+    res.json({ status: 400, data: error });
 };
 
 module.exports = router;

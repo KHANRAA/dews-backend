@@ -5,7 +5,7 @@ const upload = multer({ dest: 'uploads/' });
 const chalk = require('chalk');
 
 const { Storage } = require('@google-cloud/storage');
-const { GalleryPhoto, validateGalleryImageUploadSchema } = require('../models/gallery');
+const { Gallery, validateGalleryImageUploadSchema } = require('../models/gallery');
 
 const auth = require('../middleware/auth');
 const admin = require('../middleware/admin');
@@ -74,31 +74,30 @@ router.put('/like', auth, validateObjectId, async (req, res, next) => {
     if (!galleyPhoto) sendErrorResponse(res, `Photo not exists please recheck ... id: ${ req.body.id }`);
     if (galleyPhoto.likedBy.some(userObj => userObj._id === user._id)) sendErrorResponse(res, 'Already Liked ...');
     galleyPhoto.likedBy.push(user);
-    await galleyPhoto.save().then(success => { sendSuccessResponse(res, `${ JSON.stringify(success) }`);}).catch(err => {
-        sendErrorResponse(res, err.message);
+    await galleyPhoto.save().then(success => { return sendSuccessResponse(res, `${ JSON.stringify(success) }`);}).catch(err => {
+        return sendErrorResponse(res, err.message);
     });
 });
 
 router.delete('/delete', auth, admin, validateObjectId, async (req, res, next) => {
     await GalleryPhoto.findOneAndDelete({ _id: req.body.id }).then(result => {
-        sendSuccessResponse(res, `${ JSON.stringify(result) }`);
+        return sendSuccessResponse(res, `${ JSON.stringify(result) }`);
     }).catch(err => {
-        sendErrorResponse(res, err.message);
+        return sendErrorResponse(res, err.message);
     });
 
 });
 
 
-sendSuccessResponse = (res, responseMessage) => {
-    return res.json({ status: 200, data: responseMessage });
+const sendSuccessResponse = (res, responseMessage) => {
+    res.json({ status: 200, data: responseMessage });
 };
 
-sendRedirectResponse = (res, responseMessage) => {
-    return res.json({ status: 302, data: responseMessage });
+const sendRedirectResponse = (res, responseMessage) => {
+    res.json({ status: 302, data: responseMessage });
 };
 
-sendErrorResponse = (res, error) => {
-    return res.json({ status: 400, data: error });
+const sendErrorResponse = (res, error) => {
+    res.json({ status: 400, data: error });
 };
-
 module.exports = router;

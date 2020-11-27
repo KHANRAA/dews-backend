@@ -30,7 +30,7 @@ const gallerySchema = new Schema({
     timestamps: true
 });
 
-const GalleryPhoto = mongoose.model('GalleryPhotos', gallerySchema);
+const Gallery = mongoose.model('Gallery', gallerySchema);
 
 validateGalleryImageUploadSchema = async (blogData) => {
     const schema = Joi.object({
@@ -44,5 +44,5 @@ validateGalleryImageUploadSchema = async (blogData) => {
     }
 };
 
-exports.GalleryPhoto = GalleryPhoto;
+exports.Gallery = Gallery;
 exports.validateGalleryImageUploadSchema = validateGalleryImageUploadSchema;

@@ -49,6 +49,9 @@ const userSchema = new Schema({
     avatarImageUrl: {
         type: String
     },
+    address: {
+        type: String,
+    },
     testimonial: {
         type: String,
         minlength: 10,
