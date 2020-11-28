@@ -7,7 +7,6 @@ module.exports = () => {
         filename: 'winston-error.log',
         level: 'error',
         handleExceptions: true,
-        handleRejections: true,
     }));
     winston.add(new winston.transports.Console({
         format: winston.format.combine(winston.format.colorize(), winston.format.prettyPrint()),
