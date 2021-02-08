@@ -47,7 +47,8 @@ const userSchema = new Schema({
         default: 'Male'
     },
     avatarImageUrl: {
-        type: String
+        type: String,
+        default: 'https://storage.googleapis.com/dews_avatars/avatars/men.png'
     },
     address: {
         type: String,
@@ -63,28 +64,29 @@ const userSchema = new Schema({
 });
 
 
-userSchema.methods.generateAuthToken = async () => {
+userSchema.methods.generateAuthToken = async (user) => {
     return jwt.sign({
-        _id: this._id,
-        role: this.role,
-        name: this.name,
-        isActive: this.isActive
-    }, 'secretKey', { expiresIn: '20d' });
+        _id: user._id,
+        role: user.role,
+        name: user.name,
+        isActive: user.isActive
+    }, 'secretKey', { expiresIn: '24h' });
 };
 
 const User = mongoose.model('User', userSchema);
 
 validateUserRegistrationByPassword = async (userData) => {
+    console.log(userData);
     const pattern = '^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$';
     const schema = Joi.object({
         email: Joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com'] } }).required(),
         name: Joi.string().min(3).max(40).required(),
-        password: Joi.string().pattern(new RegExp(pattern)).required()
+        password: Joi.string().min(6).max(40).pattern(new RegExp(pattern)).required(),
+        returnSecureToken: Joi.boolean().invalid(false).required(),
     });
     try {
         return await schema.validate(userData);
     } catch (err) {
-        info('hi...');
     }
 };
 
@@ -106,7 +108,8 @@ validatePasswordLogin = async (userData) => {
     const pattern = '^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$';
     const schema = Joi.object({
         email: Joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com'] } }).required(),
-        password: Joi.string().pattern(new RegExp(pattern)).required()
+        password: Joi.string().min(6).max(40).pattern(new RegExp(pattern)).required(),
+        returnSecureToken: Joi.boolean().invalid(false).required(),
     });
     try {
         return await schema.validate(userData);

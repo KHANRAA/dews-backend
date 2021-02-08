@@ -8,5 +8,5 @@ module.exports = () => {
         useFindAndModify: false,
         useCreateIndex: true,
         useUnifiedTopology: true
-    }).then(() => winston.info(chalk.cyan('Connected to mongodb')));
+    }).then(() => console.log(chalk.cyan('Connected to mongodb...')));
 };

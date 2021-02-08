@@ -1,4 +1,3 @@
-const express = require('express');
 const authController = require('../controllers/authController');
 const blogController = require('../controllers/blogController');
 const contactController = require('../controllers/contactController');

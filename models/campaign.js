@@ -108,7 +108,7 @@ validateCampaignSchema = async (campaignData) => {
         title: Joi.string().min(3).required(),
         subtitle: Joi.string().min(3).required(),
         content: Joi.string().min(20).max(1024).required(),
-        campaignType: Joi.string().valid('fund', 'general').required(),
+        campaignType: Joi.string().valid('donation', 'free').required(),
         imageUrl: Joi.string().uri().empty('').default('acasc').required(),
         goalAmount: Joi.number().min(1).max(1000000).required(),
         campaignDate: Joi.date().min(Date.now()).required(),

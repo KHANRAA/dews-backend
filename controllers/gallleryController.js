@@ -38,17 +38,19 @@ router.post('/submit', auth, admin, async (req, res, next) => {
 
 });
 
-router.put('/upload', auth, admin, upload.single('photo'), async (req, res, next) => {
-
+router.post('/upload', auth, admin, async (req, res, next) => {
     if (!req.file) {
         console.log(chalk.red('No file received..'));
-        sendErrorResponse(res, 'No File received for upload...');
+        throw new Error('No image provided.....');
     }
+    console.log(chalk.green('in Uopload...'));
     const tempUploadPath = req.file.path;
-    const storage = new Storage({ keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS });
+    const storage = new Storage({ keyFilename: '/Volumes/workplace/personal/dews-backend/config/inside-ngo-0af11d83ca0e.json' });
     const bucketName = 'gallery_bucket';
+    await storage.bucket(bucketName).makePublic({});
     await storage.bucket(bucketName).upload(tempUploadPath, {
         gzip: true,
+        public: true,
         // By setting the option `destination`, you can change the name of the
         // object you are uploading to a bucket.
         metadata: {
@@ -57,9 +59,10 @@ router.put('/upload', auth, admin, upload.single('photo'), async (req, res, next
             // (If the contents will change, use cacheControl: 'no-cache')
             cacheControl: 'public, max-age=31536000',
         },
-    }).then(() => {
-        console.log(chalk.green()`${ tempUploadPath.toString() } uploaded to ${ bucketName }.`);
-        sendSuccessResponse(res, 'Image Upload successful...');
+    }).then((saveResult) => {
+        console.log(chalk.green(`${ tempUploadPath.toString() } uploaded to ${ bucketName }. 
+        with result https://storage.googleapis.com/${ bucketName }/${ tempUploadPath.substr(15, tempUploadPath.length) } }`));
+        sendSuccessResponse(res, `https://storage.googleapis.com/${ bucketName }/${ tempUploadPath.substr(15, tempUploadPath.length) }`);
     }).catch((err) => {
         next(err);
     }).finally(() => {

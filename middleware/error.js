@@ -8,5 +8,5 @@ module.exports = (err, req, res, next) => {
     //verbose
     //debug
     //silly
-    res.status(500).send(err.message || 'Something went wrong ...');
+    res.status(500).json({ status: 500, data: err.message || 'Something went wrong ...' });
 }

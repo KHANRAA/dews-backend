@@ -53,7 +53,7 @@ validateBlogSchema = async (blogData) => {
         title: Joi.string().min(3).required(),
         content: Joi.string().min(20).required(),
         isHighlight: Joi.boolean().default(false).required(),
-        imageUrl: Joi.string().uri().empty('').default('acasc').required(),
+        imageUrl: Joi.string().min(24).max(24).required(),
         tags: Joi.array().items(Joi.string().min(2)).empty(),
     });
     try {

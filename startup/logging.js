@@ -13,7 +13,7 @@ module.exports = () => {
     }));
 
     winston.add(new winston.transports.MongoDB({
-        db: 'db',
+        db: 'mongodb+srv://test:doDSF39grqRulNb6@cluster0.6ci57.mongodb.net/dews?retryWrites=true&w=majority',
         level: 'error'
     }));
 
